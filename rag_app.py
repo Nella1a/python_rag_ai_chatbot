@@ -35,3 +35,19 @@ vector_db = Chroma.from_documents(
     embedding=embeddings,
     persist_directory="./chroma_db"
 )
+
+# Configure db to act as a document retriever
+retriever = vector_db.as_retriever(search_kwargs={"k": 2}) # k = pull the two most relevant chunks for any given questiion
+
+# Define the hidden prompt structure for the LLM
+template = """
+Use the following pieces of retrieved context to answer the question.
+If you don't know the answer, just say that you don't know.
+Use three sentence maximum and keep the answer consise.
+
+Context: {context}
+
+Question: {question}
+"""
+
+prompt = PromptTemplate.from_template(template)
