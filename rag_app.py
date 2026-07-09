@@ -43,7 +43,7 @@ retriever = vector_db.as_retriever(search_kwargs={"k": 2}) # k = pull the two mo
 template = """
 Use the following pieces of retrieved context to answer the question.
 If you don't know the answer, just say that you don't know.
-Use three sentence maximum and keep the answer consise.
+Use three sentence maximum and keep the answer concise.
 
 Context: {context}
 
@@ -51,3 +51,17 @@ Question: {question}
 """
 
 prompt = PromptTemplate.from_template(template)
+
+# Initialize the free Gemini model tier
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+
+# Helper function to stitch retrieved chunks into a single text block
+def format_docs(docs):
+    return "\n\n".json(doc.page_content for doc in docs)
+
+# Connect everything together using LangChain Expression Language (LCEL)
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+)
