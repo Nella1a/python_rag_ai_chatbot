@@ -1,3 +1,4 @@
 .env
 .idea/
 data_pdf/
+chroma_db/
