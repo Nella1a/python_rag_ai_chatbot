@@ -14,13 +14,13 @@ PDF_FILENAME = "TechCorp_Official_Employee_Handbook.pdf"
 pdf_path = os.path.join(DATA_PATH, PDF_FILENAME)
 
 
-print("\nLoading PDF document...")
+print("\n\n **** Loading PDF document... ***\n")
 loader = OpenDataLoaderPDFLoader(file_path=pdf_path, format="text")
 document = loader.load()
 print(document[0])
 
 
-print("\nchunking text ....")
+print("\n\n *** chunking text .... ***\n")
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=500,
     chunk_overlap=50
@@ -28,8 +28,8 @@ text_splitter = RecursiveCharacterTextSplitter(
 chunks = text_splitter.split_documents(documents=document)
 print(chunks[0])
 
-print("\nCreating vector database ...")
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+print("\n\n *** Creating vector database ... ***\n")
+embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 vector_db = Chroma.from_documents(
     documents=chunks,
     embedding=embeddings,
@@ -53,11 +53,11 @@ Question: {question}
 prompt = PromptTemplate.from_template(template)
 
 # Initialize the free Gemini model tier
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
 
 # Helper function to stitch retrieved chunks into a single text block
 def format_docs(docs):
-    return "\n\n".json(doc.page_content for doc in docs)
+    return "\n\n".join(doc.page_content for doc in docs)
 
 # Connect everything together using LangChain Expression Language (LCEL)
 rag_chain = (
@@ -65,3 +65,10 @@ rag_chain = (
     | prompt
     | llm
 )
+
+
+user_question = "What days can I work from home?"
+print(f"\nQuestion:", {user_question})
+
+response = rag_chain.invoke(user_question)
+print(f"Answer:", {response})
