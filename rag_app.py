@@ -7,6 +7,8 @@ from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
+# quelle: https://www.freecodecamp.org/news/rag-explained-simply-with-a-real-project/
+
 load_dotenv()
 
 DATA_PATH = "data_pdf/"
